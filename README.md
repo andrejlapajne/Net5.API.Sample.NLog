@@ -67,61 +67,61 @@ The example presented below shows a database and a [SEQ](https://datalust.co/seq
     },
     ...
     "NLog": {
-    "autoReload": true,
-    "throwConfigExceptions": true,
-    "extensions": [],
-    "targets": {
-        "async": true,
-        "database": {
-            "type": "Database",
-            "dbProvider": "Microsoft.Data.SqlClient.SqlConnection, Microsoft.Data.SqlClient",
-            "connectionString": "${configsetting:item=ConnectionStrings.MyDb}",
-            "commandText": "INSERT INTO [Logs] ([Message], [Level], [Date]) VALUES (@Message, @Level, @Date)",
-            "parameters": [
-                {
-                    "name": "@Message",
-                    "layout": "${message:truncate=1000}"
-                },
-                {
-                    "name": "@Level",
-                    "layout": "${event-properties:levelId}"
-                },
-                {
-                "name": "@Date",
-                "layout": "${event-properties:date}",
-                "dbType": "DbType.DateTime"
-                }
-            ]
+        "autoReload": true,
+        "throwConfigExceptions": true,
+        "extensions": [],
+        "targets": {
+            "async": true,
+            "database": {
+                "type": "Database",
+                "dbProvider": "Microsoft.Data.SqlClient.SqlConnection, Microsoft.Data.SqlClient",
+                "connectionString": "${configsetting:item=ConnectionStrings.MyDb}",
+                "commandText": "INSERT INTO [Logs] ([Message], [Level], [Date]) VALUES (@Message, @Level, @Date)",
+                "parameters": [
+                    {
+                        "name": "@Message",
+                        "layout": "${message:truncate=1000}"
+                    },
+                    {
+                        "name": "@Level",
+                        "layout": "${event-properties:levelId}"
+                    },
+                    {
+                    "name": "@Date",
+                    "layout": "${event-properties:date}",
+                    "dbType": "DbType.DateTime"
+                    }
+                ]
+            },
+            "seq": {
+                "type": "Seq",
+                "serverUrl": "",
+                "apiKey": "",
+                "properties": [
+                    {
+                        "name": "threadId",
+                        "value": "${threadid}",
+                        "as": "id"
+                    },
+                    {
+                        "name": "name",
+                        "value": "${machinename}"
+                    }
+                ]
+            }
         },
-        "seq": {
-            "type": "Seq",
-            "serverUrl": "",
-            "apiKey": "",
-            "properties": [
-                {
-                    "name": "threadId",
-                    "value": "${threadid}",
-                    "as": "id"
-                },
-                {
-                    "name": "name",
-                    "value": "${machinename}"
-                }
-            ]
-        }
-    },
-    "rules": [
-        {
-            "logger": "*",
-            "minLevel": "Trace",
-            "writeTo": "database"
-        },
-        {
-            "logger": "*",
-            "minLevel": "Trace",
-            "writeTo": "seq"
-        }
-    ]
+        "rules": [
+            {
+                "logger": "*",
+                "minLevel": "Trace",
+                "writeTo": "database"
+            },
+            {
+                "logger": "*",
+                "minLevel": "Trace",
+                "writeTo": "seq"
+            }
+        ]
     },
     ...
 }
