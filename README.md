@@ -63,7 +63,7 @@ The example presented below shows a database and a [SEQ](https://datalust.co/seq
 {
     ...
     "ConnectionStrings": {
-        "MyDb": "Server=myHost;Initial Catalog=myDb; Trusted_Connection=True;"
+        "Sample.NLog": "Server=myHost;Initial Catalog=myDb; Trusted_Connection=True;"
     },
     ...
     "NLog": {
@@ -75,8 +75,8 @@ The example presented below shows a database and a [SEQ](https://datalust.co/seq
             "database": {
                 "type": "Database",
                 "dbProvider": "Microsoft.Data.SqlClient.SqlConnection, Microsoft.Data.SqlClient",
-                "connectionString": "${configsetting:item=ConnectionStrings.MyDb}",
-                "commandText": "INSERT INTO [Logs] ([Message], [Level], [Date]) VALUES (@Message, @Level, @Date)",
+                "connectionString": "${configsetting:item=ConnectionStrings.Sample.NLog}",
+                "commandText": "INSERT INTO [LogEntries] ([Message], [Level], [Date]) VALUES (@Message, @Level, @Date)",
                 "parameters": [
                     {
                         "name": "@Message",
@@ -130,6 +130,7 @@ The example presented below shows a database and a [SEQ](https://datalust.co/seq
 ## References
 - [NLog configuration](https://nlog-project.org/config/)
 - [NLog configuration file](https://github.com/NLog/NLog/wiki/Configuration-file)
+- [NLog database target](https://github.com/NLog/NLog/wiki/Database-target)
 - [NLog logging troubleshooting](https://github.com/NLog/NLog/wiki/Logging-Troubleshooting)
 - [NLog new exception handling rules](https://nlog-project.org/2010/09/05/new-exception-handling-rules-in-nlog-2-0.html)
 - [NLog configuration with appsettings.json](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-configuration-with-appsettings.json)
