@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Net5.API.Sample.Data;
+using Net5.API.Sample.Model;
 
 namespace Net5.API.Sample.Controllers
 {
@@ -16,24 +19,28 @@ namespace Net5.API.Sample.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<WeatherForecastController> logger;
+        private readonly SampleDbContext dbContext;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, SampleDbContext dbContext)
         {
-            _logger = logger;
+            this.logger = logger;
+            this.dbContext = dbContext;
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<IEnumerable<WeatherForecast>> Get()
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            try
             {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+                return await dbContext.WeatherForecasts.OrderByDescending(x => x.Date).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Error occurred in '{nameof(WeatherForecastController)}/{nameof(Get)}([GET])'");
+            }
+
+            return new WeatherForecast[] { };
         }
     }
 }

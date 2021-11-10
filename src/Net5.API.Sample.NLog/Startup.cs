@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Net5.API.Sample.Data;
+using Net5.API.Sample.Model;
+using NLog.LayoutRenderers;
 using NLog.Web;
 
 namespace Net5.API.Sample
@@ -20,12 +24,21 @@ namespace Net5.API.Sample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            LayoutRenderer.Register("int-level", info => info.Level.Ordinal);
             NLog.LogManager.Setup().LoadConfigurationFromAppSettings();
+
+            services.AddDbContext<SampleDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("SampleNLog")));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Net5.API.Sample.NLog", Version = "v1" });
+            });
+
+            services.AddLogging(builder =>
+            {
+                builder.AddNLogWeb();
             });
         }
 

@@ -1,11 +1,10 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Net5.API.Sample.Data;
+using NLog.Web;
 
 namespace Net5.API.Sample
 {
@@ -13,7 +12,28 @@ namespace Net5.API.Sample
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+
+
+            var host = CreateHostBuilder(args).Build();
+
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                try
+                {
+                    logger.LogTrace("Initializing database...");
+                    var context = services.GetRequiredService<SampleDbContext>();
+                    DatabaseInitializer.Initialize(context, logger);
+                    logger.LogTrace("Database initialized.");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "An error occurred while initializing the database.");
+                }
+            }
+
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -21,6 +41,7 @@ namespace Net5.API.Sample
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .UseNLog();
     }
 }
